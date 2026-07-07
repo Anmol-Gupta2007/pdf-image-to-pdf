@@ -120,7 +120,7 @@ function renderUI() {
         card.innerHTML = `
             <img src="${imgObj.previewUrl}" class="image-preview" alt="Preview">
             <div class="image-name">${imgObj.file.name}</div>
-            <button class="remove-btn" onclick="removeImage(${index})">❌ Remove</button>
+            <button class="remove-btn" onclick="removeImage(${index})">✔️ Remove</button>
         `;
         
         outputContainer.appendChild(card);
