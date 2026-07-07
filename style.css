@@ -97,11 +97,18 @@ header p {
     margin-bottom: 0.5rem;
 }
 
+.convert-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
 .final-btn {
     color: white;
     border: none;
-    padding: 1rem 2.5rem;
-    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
@@ -111,6 +118,11 @@ header p {
 .btn-single {
     background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
     box-shadow: 0 4px 6px rgba(79, 172, 254, 0.4);
+}
+
+.btn-individual {
+    background: linear-gradient(90deg, #ffb86c 0%, #ff9a9e 100%);
+    box-shadow: 0 4px 6px rgba(255, 184, 108, 0.4);
 }
 
 .final-btn:hover {
