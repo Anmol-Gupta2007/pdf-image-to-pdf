@@ -8,7 +8,8 @@ const chooseBtn = document.getElementById('choose-btn');
 const outputContainer = document.getElementById('output-container');
 const actionBar = document.getElementById('action-bar');
 const statusText = document.getElementById('status-text');
-const convertBtn = document.getElementById('convert-btn');
+const convertSingleBtn = document.getElementById('convert-single-btn');
+const convertIndividualBtn = document.getElementById('convert-individual-btn');
 const modal = document.getElementById('processing-modal');
 
 // --- Helper: Download Function ---
@@ -60,7 +61,6 @@ uploadArea.addEventListener('drop', (e) => {
 
 // --- Handle Adding Files ---
 function handleFiles(files) {
-    // Filter only JPG and PNG images
     const newFiles = Array.from(files).filter(file => 
         file.type === 'image/jpeg' || 
         file.type === 'image/jpg' || 
@@ -76,7 +76,6 @@ function handleFiles(files) {
 
     let filesProcessed = 0;
 
-    // Use FileReader to create object URLs for the previews
     newFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -88,7 +87,6 @@ function handleFiles(files) {
 
             filesProcessed++;
             
-            // Once all newly added files are processed, render the UI
             if (filesProcessed === newFiles.length) {
                 renderUI();
                 modal.style.display = 'none';
@@ -119,7 +117,6 @@ function renderUI() {
         const card = document.createElement('div');
         card.className = 'image-card';
 
-        // Display the actual image using the generated Data URL
         card.innerHTML = `
             <img src="${imgObj.previewUrl}" class="image-preview" alt="Preview">
             <div class="image-name">${imgObj.file.name}</div>
@@ -130,8 +127,8 @@ function renderUI() {
     });
 }
 
-// --- Convert to PDF Logic ---
-convertBtn.addEventListener('click', async () => {
+// --- OPTION 1: Convert to Single PDF ---
+convertSingleBtn.addEventListener('click', async () => {
     if (uploadedImages.length === 0) return;
 
     modal.style.display = 'flex';
@@ -140,26 +137,19 @@ convertBtn.addEventListener('click', async () => {
         const { PDFDocument } = PDFLib;
         const newPdfDoc = await PDFDocument.create();
 
-        // Loop through all images and add them as pages
         for (const imgObj of uploadedImages) {
-            // Fetch fresh bytes from the File object
             const imageBytes = await imgObj.file.arrayBuffer();
             let embeddedImage;
 
-            // Embed based on file type
             if (imgObj.isJpg) {
                 embeddedImage = await newPdfDoc.embedJpg(imageBytes);
             } else {
                 embeddedImage = await newPdfDoc.embedPng(imageBytes);
             }
 
-            // Get original image dimensions to create a perfectly sized PDF page
             const imgDims = embeddedImage.scale(1);
-            
-            // Create a new page matching the image dimensions
             const page = newPdfDoc.addPage([imgDims.width, imgDims.height]);
 
-            // Draw the image filling the entire page
             page.drawImage(embeddedImage, {
                 x: 0,
                 y: 0,
@@ -168,12 +158,60 @@ convertBtn.addEventListener('click', async () => {
             });
         }
 
-        // Save and trigger download
         const pdfBytes = await newPdfDoc.save();
         download(pdfBytes, "Converted_Images.pdf", "application/pdf");
         
     } catch (error) {
         console.error("Error converting images:", error);
+        alert("An error occurred during conversion.");
+    }
+    
+    modal.style.display = 'none';
+});
+
+// --- OPTION 2: Convert to Individual PDFs ---
+convertIndividualBtn.addEventListener('click', async () => {
+    if (uploadedImages.length === 0) return;
+
+    modal.style.display = 'flex';
+
+    try {
+        const { PDFDocument } = PDFLib;
+
+        // Loop through each image and create a separate PDF for it
+        for (const imgObj of uploadedImages) {
+            const newPdfDoc = await PDFDocument.create();
+            const imageBytes = await imgObj.file.arrayBuffer();
+            let embeddedImage;
+
+            if (imgObj.isJpg) {
+                embeddedImage = await newPdfDoc.embedJpg(imageBytes);
+            } else {
+                embeddedImage = await newPdfDoc.embedPng(imageBytes);
+            }
+
+            const imgDims = embeddedImage.scale(1);
+            const page = newPdfDoc.addPage([imgDims.width, imgDims.height]);
+
+            page.drawImage(embeddedImage, {
+                x: 0,
+                y: 0,
+                width: imgDims.width,
+                height: imgDims.height,
+            });
+
+            const pdfBytes = await newPdfDoc.save();
+            
+            // Strip the old extension (.png/.jpg) and add .pdf
+            const originalNameWithoutExt = imgObj.file.name.replace(/\.[^/.]+$/, "");
+            download(pdfBytes, `${originalNameWithoutExt}_Converted.pdf`, "application/pdf");
+            
+            // Add a slight delay so the browser can process multiple downloads cleanly
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+        
+    } catch (error) {
+        console.error("Error converting images individually:", error);
         alert("An error occurred during conversion.");
     }
     
