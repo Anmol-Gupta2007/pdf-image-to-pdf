@@ -13,7 +13,7 @@
         <div class="container">
             <header>
                 <h1>🖼️ Image to PDF</h1>
-                <p>Upload images (JPG, PNG), arrange them, and convert them into a single PDF document.</p>
+                <p>Upload images (JPG, PNG), arrange them, and convert them into PDF documents.</p>
             </header>
             
             <div class="upload-area" id="upload-area">
@@ -27,7 +27,11 @@
                 <p id="status-text" style="color: #4facfe; font-weight: 600; margin-bottom: 1.5rem; font-size: 1.1rem;">
                     0 images selected.
                 </p>
-                <button id="convert-btn" class="final-btn btn-single">⬇️ Convert to PDF</button>
+                
+                <div class="convert-buttons">
+                    <button id="convert-single-btn" class="final-btn btn-single">📦 Convert to Single PDF</button>
+                    <button id="convert-individual-btn" class="final-btn btn-individual">📑 Convert to Individual PDFs</button>
+                </div>
                 <hr class="divider">
             </div>
 
@@ -39,7 +43,7 @@
         <div class="modal-content">
             <div class="loader"></div>
             <h2>Processing...</h2>
-            <p>Please wait while we build your PDF.</p>
+            <p>Please wait while we build your PDF(s).</p>
         </div>
     </div>
 
